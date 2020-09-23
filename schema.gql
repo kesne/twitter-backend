@@ -21,7 +21,6 @@ type Mutation {
 }
 
 type Query {
-  hello: String!
   timeline: [Tweet!]!
   user(id: String!): User!
   users: [User!]!

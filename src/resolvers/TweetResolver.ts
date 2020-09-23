@@ -1,14 +1,14 @@
-import { Resolver, Query, Arg, Mutation } from "type-graphql";
+import { Resolver, Query, Arg, Mutation, Ctx } from "type-graphql";
 import { Tweet, TweetType } from "../entity/Tweet";
 import { User } from "../entity/User";
 import { Follow } from "../entity/Follow";
 import { In } from "typeorm";
+import { Context } from "../types";
 
 @Resolver()
 export class TweetResolver {
   @Query(() => [Tweet])
-  async timeline() {
-    const user = await User.findOneOrFail(1);
+  async timeline(@Ctx() { user }: Context) {
     const usersForTimeline = await Follow.find({
       where: {
         fromUser: user,
@@ -26,10 +26,10 @@ export class TweetResolver {
   }
 
   @Mutation(() => Tweet)
-  async createTweet(@Arg("text") text: string) {
+  async createTweet(@Arg("text") text: string, @Ctx() { user }: Context) {
     const tweet = Tweet.create({
       text,
-      user: await User.findOneOrFail(1),
+      user,
     });
 
     await tweet.save();
