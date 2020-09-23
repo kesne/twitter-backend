@@ -10,19 +10,25 @@ import {
 } from "typeorm";
 import { Lazy } from "../types";
 import { User } from "./User";
+import { ObjectType, Field, ID } from "type-graphql";
 
+@ObjectType()
 @Entity()
 @Unique(["fromUser", "toUser"])
 export class Follow extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Field(() => Date)
   @CreateDateColumn({ type: "datetime" })
   createdAt!: Date;
 
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.following)
   fromUser!: User;
 
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.followers)
   toUser!: User;
 

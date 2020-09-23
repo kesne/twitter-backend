@@ -1,56 +1,79 @@
 import "reflect-metadata";
 import { createConnection, In } from "typeorm";
-import { User } from "./entity/User";
-import { Tweet, TweetType } from "./entity/Tweet";
-import { Favorite } from "./entity/Favorite";
-import { Follow } from "./entity/Follow";
+import { ApolloServer } from 'apollo-server';
+import { buildSchema } from "type-graphql";
+import { TestResolver } from "./resolvers/TestResolver";
+import { UserResolver } from "./resolvers/UserResolver";
+import { TweetResolver } from "./resolvers/TweetResolver";
+import { FollowResolver } from "./resolvers/FollowResolver";
 
-createConnection()
-  .then(async (connection) => {
-	const [mewtru, vapejuicejim] = await User.find();
+async function main() {
+  await createConnection();
 
-	await vapejuicejim.follow(mewtru);
+  const schema = await buildSchema({
+    resolvers: [TestResolver, UserResolver, TweetResolver, FollowResolver],
+    emitSchemaFile: true,
+  });
 
-    // const usersForTimeline = await Follow.find({
-    //   where: {
-    //     fromUser: user,
-    //   },
-    //   relations: ["toUser"],
-    // });
+  const server = new ApolloServer({
+    schema,
+    playground: true,
+  });
 
-    // console.log(
-    //   await Tweet.find({
-    //     where: {
-	// 	  user: In(usersForTimeline.map((follow) => follow.toUser.id)),
-	// 	  type: In([TweetType.NONE, TweetType.RETWEET])
-    //     },
-    //   })
-    // );
+  // Start the server
+  const { url } = await server.listen(4000);
+  console.log(`Server is running, GraphQL Playground available at ${url}`);
 
-    //   const follow = Follow.create({
-    // 	  fromUser: users[0],
-    // 	  toUser: users[1]
-    //   });
+}
 
-    //   follow.save();
-    //   const user = await User.create({ name: 'vapejuicejim' }).save();
-    //   const tweet = await Tweet.create({ text: 'I love TypeScript.', user }).save();
+main();
 
-    // const user = await User.findOneOrFail({});
-    // const tweet = await Tweet.findOneOrFail({});
+// createConnection()
+//   .then(async (connection) => {
+//     const [mewtru, vapejuicejim] = await User.find();
 
-    // const reply = await Tweet.create({
-    // 	type: TweetType.RETWEET,
-    // 	parent: tweet,
-    // 	user,
-    // }).save();
+//     await vapejuicejim.follow(mewtru);
 
-    // const tweets = await Tweet.find({
-    //   type: In([TweetType.NONE, TweetType.RETWEET]),
-    // });
+// const usersForTimeline = await Follow.find({
+//   where: {
+//     fromUser: user,
+//   },
+//   relations: ["toUser"],
+// });
 
-    // console.log(await tweets);
+// console.log(
+//   await Tweet.find({
+//     where: {
+// 	  user: In(usersForTimeline.map((follow) => follow.toUser.id)),
+// 	  type: In([TweetType.NONE, TweetType.RETWEET])
+//     },
+//   })
+// );
 
-    // await reply.save();
-  })
-  .catch((error) => console.log(error));
+//   const follow = Follow.create({
+// 	  fromUser: users[0],
+// 	  toUser: users[1]
+//   });
+
+//   follow.save();
+//   const user = await User.create({ name: 'vapejuicejim' }).save();
+//   const tweet = await Tweet.create({ text: 'I love TypeScript.', user }).save();
+
+// const user = await User.findOneOrFail({});
+// const tweet = await Tweet.findOneOrFail({});
+
+// const reply = await Tweet.create({
+// 	type: TweetType.RETWEET,
+// 	parent: tweet,
+// 	user,
+// }).save();
+
+// const tweets = await Tweet.find({
+//   type: In([TweetType.NONE, TweetType.RETWEET]),
+// });
+
+// console.log(await tweets);
+
+// await reply.save();
+// })
+// .catch((error) => console.log(error));

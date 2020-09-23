@@ -5,19 +5,24 @@ import {
   BaseEntity,
   OneToMany,
 } from "typeorm";
+import { ObjectType, Field, ID } from "type-graphql";
 import { Tweet } from "./Tweet";
 import { Lazy } from "../types";
 import { Favorite } from "./Favorite";
 import { Follow } from "./Follow";
 
+@ObjectType()
 @Entity()
 export class User extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Field()
   @Column({ unique: true })
   name!: string;
 
+  @Field(() => [Tweet])
   @OneToMany(() => Tweet, (tweet) => tweet.user, { lazy: true })
   tweets!: Lazy<Tweet[]>;
 
